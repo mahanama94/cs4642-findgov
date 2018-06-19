@@ -1,9 +1,5 @@
-import re
-import sys
 
-from nltk import word_tokenize, pos_tag, ne_chunk
-from nltk.corpus import stopwords
-from nltk.tree import Tree
+from nltk import ne_chunk
 
 
 class EntityRecognitionPipeline(object):
@@ -14,35 +10,35 @@ class EntityRecognitionPipeline(object):
         self.file.close()
 
     def process_item(self, item, spider):
-        reload(sys)
-        sys.setdefaultencoding('utf-8')
-        response_text = item["response"].text
-        non_tagged_response = re.sub("<.*?>", " ", response_text)
-        word_tokens = word_tokenize(non_tagged_response)
-        stop_words = set(stopwords.words('english'))
-        filtered_tokens = [w for w in word_tokens if not w in stop_words]
-        tagged = pos_tag(filtered_tokens)
-        named_ent = ne_chunk(tagged, binary=True)
-        chunks = self.get_continuous_chunks(named_ent)
-        self.file.write(' '.join(chunks))
+        tagged = item["pos_tags"]
+        chunks = ne_chunk(tagged, binary=True)
+        item["entities"] = self.get_named_entities(chunks)
+        self.file.write(' '.join([item for pos, item in item["entities"]]))
         return item
 
-    def get_continuous_chunks(self, chunked):
-        prev = None
+    # def get_continuous_chunks(self, chunked):
+    #     prev = None
+    #
+    #     continuous_chunk = []
+    #
+    #     current_chunk = []
+    #
+    #     for i in chunked:
+    #
+    #         if type(i) == Tree:
+    #             current_chunk.append(" ".join([token for token, pos in i.leaves()]))
+    #         elif current_chunk:
+    #             named_entity = " ".join(current_chunk)
+    #             if named_entity not in continuous_chunk:
+    #                 continuous_chunk.append(named_entity)
+    #                 current_chunk = []
+    #         else:
+    #             continue
+    #     return continuous_chunk
 
-        continuous_chunk = []
-
-        current_chunk = []
-
-        for i in chunked:
-
-            if type(i) == Tree:
-                current_chunk.append(" ".join([token for token, pos in i.leaves()]))
-            elif current_chunk:
-                named_entity = " ".join(current_chunk)
-                if named_entity not in continuous_chunk:
-                    continuous_chunk.append(named_entity)
-                    current_chunk = []
-            else:
-                continue
-        return continuous_chunk
+    def get_named_entities(self, chunks):
+        entity_list = list()
+        for chunk in chunks:
+            if hasattr(chunk, 'label'):
+                entity_list.append((chunk.label(), ' '.join(c[0] for c in chunk)))
+        return entity_list

@@ -10,9 +10,12 @@ class TitleHandlerPipeline(object):
 
 
     def process_item(self, item, spider):
-        response_text = item['response'].text
-        soup = BeautifulSoup(response_text, 'html.parser')
-        title = soup.title.string
-        line = json.dumps(title) + "\n"
-        self.file.write(line)
-        return item
+        try:
+            response_text = item['response'].text
+            soup = BeautifulSoup(response_text, 'html.parser')
+            title = soup.title.string
+            line = json.dumps(title) + "\n"
+            self.file.write(line)
+            return item
+        except:
+            return item
