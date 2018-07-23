@@ -14,16 +14,22 @@ class EntityRecognitionPipeline(object):
         tagged = item["pos_tags"]
         chunks = ne_chunk(tagged, binary=True)
         entities = self.get_named_entities(chunks)
-        # self.file.write(' '.join([item for pos, item in entities]))
+        entity_list = list()
+        for entity in entities:
+            entity_list.append(entity[1])
 
-        filename = "entities/" + item["title"] + ".txt"
+        entity_info = dict()
+        entity_info["entities"] = entity_list
+        entity_info["reference"] = item["response"].url
+
+        filename = "entities/" + item["title"] + ".json"
 
         if not os.path.exists(os.path.dirname(filename)):
             os.makedirs(os.path.dirname(filename))
         with open(filename, "a") as f:
-            f.write(json.dumps(entities))
+            f.write(json.dumps(entity_info) + "\n")
 
-        item["entities"] = entities
+        item["entities"] = entity_info
         return item
 
     # def get_continuous_chunks(self, chunked):
