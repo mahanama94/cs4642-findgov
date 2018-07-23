@@ -65,9 +65,10 @@ ROBOTSTXT_OBEY = True
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     'FindGov.pipelines.TitleHandlerPipeline': 100,
-    'FindGov.pipelines.PDFHandlerPipeline' : 200,
-    'FindGov.pipelines.PosTagPipeline' : 300,
-    'FindGov.pipelines.EntityRecognitionPipeline': 301
+    'FindGov.pipelines.PDFHandlerPipeline': 200,
+    'FindGov.pipelines.PosTagPipeline': 300,
+    'FindGov.pipelines.ContactExtractionPipeline': 301,
+    'FindGov.pipelines.EntityRecognitionPipeline': 302
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

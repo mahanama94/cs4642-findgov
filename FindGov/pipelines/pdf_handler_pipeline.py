@@ -2,12 +2,13 @@ import urllib2
 import io
 import PyPDF2
 
-class PDFHandlerPipeline(object):
-    def open_spider(self, spider):
-        self.file = open('pdf.jl', 'w')
 
-    def close_spider(self, spider):
-        self.file.close()
+class PDFHandlerPipeline(object):
+    # def open_spider(self, spider):
+    #     self.file = open('pdf.jl', 'w')
+    #
+    # def close_spider(self, spider):
+    #     self.file.close()
 
     def process_item(self, item, spider):
         response = item['response']
@@ -25,6 +26,5 @@ class PDFHandlerPipeline(object):
                 page_data.append(page)
 
             item["response_text"] = " ".join(page_data)
-            print(item["response_text"])
-            self.file.write(" ".join(page_data))
+            # self.file.write(" ".join(page_data))
         return item

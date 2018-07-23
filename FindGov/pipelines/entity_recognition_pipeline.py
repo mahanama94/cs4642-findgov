@@ -1,19 +1,29 @@
-
+import os
+import json
 from nltk import ne_chunk
 
 
 class EntityRecognitionPipeline(object):
-    def open_spider(self, spider):
-        self.file = open('entities.jl', 'w')
-
-    def close_spider(self, spider):
-        self.file.close()
+    # def open_spider(self, spider):
+    #     self.file = open('entities.jl', 'w')
+    #
+    # def close_spider(self, spider):
+    #     self.file.close()
 
     def process_item(self, item, spider):
         tagged = item["pos_tags"]
         chunks = ne_chunk(tagged, binary=True)
-        item["entities"] = self.get_named_entities(chunks)
-        self.file.write(' '.join([item for pos, item in item["entities"]]))
+        entities = self.get_named_entities(chunks)
+        # self.file.write(' '.join([item for pos, item in entities]))
+
+        filename = "entities/" + item["title"] + ".txt"
+
+        if not os.path.exists(os.path.dirname(filename)):
+            os.makedirs(os.path.dirname(filename))
+        with open(filename, "a") as f:
+            f.write(json.dumps(entities))
+
+        item["entities"] = entities
         return item
 
     # def get_continuous_chunks(self, chunked):
